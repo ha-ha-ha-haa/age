@@ -54,10 +54,8 @@ void object_access_hook_init(void)
     prev_object_hook_is_set = true;
 }
 
-void object_access_hook_fini(void)
-{
-    if (prev_object_hook_is_set)
-    {
+void object_access_hook_fini(void){
+    if (prev_object_hook_is_set){
         object_access_hook = prev_object_access_hook;
         prev_object_access_hook = NULL;
         prev_object_hook_is_set = false;
