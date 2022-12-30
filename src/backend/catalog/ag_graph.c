@@ -39,8 +39,7 @@
 static Oid get_graph_namespace(const char *graph_name);
 
 // INSERT INTO ag_catalog.ag_graph VALUES (graph_name, nsp_id)
-Oid insert_graph(const Name graph_name, const Oid nsp_id)
-{
+Oid insert_graph(const Name graph_name, const Oid nsp_id){
     Datum values[Natts_ag_graph];
     bool nulls[Natts_ag_graph];
     Relation ag_graph;
