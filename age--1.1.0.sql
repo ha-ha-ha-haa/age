@@ -29,6 +29,9 @@ CREATE TABLE ag_graph (
   namespace regnamespace NOT NULL
 ) WITH (OIDS);
 
+-- include content of the ag_graph table into the pg_dump output
+SELECT pg_catalog.pg_extension_config_dump('ag_graph', '');
+
 CREATE UNIQUE INDEX ag_graph_oid_index ON ag_graph USING btree (oid);
 
 CREATE UNIQUE INDEX ag_graph_name_index ON ag_graph USING btree (name);
@@ -50,6 +53,9 @@ CREATE TABLE ag_label (
   relation regclass NOT NULL,
   seq_name name NOT NULL
 ) WITH (OIDS);
+
+-- include content of the ag_label table into the pg_dump output
+SELECT pg_catalog.pg_extension_config_dump('ag_label', '');
 
 CREATE UNIQUE INDEX ag_label_oid_index ON ag_label USING btree (oid);
 
@@ -3501,7 +3507,7 @@ AS 'MODULE_PATHNAME';
 CREATE FUNCTION ag_catalog.age_tointeger(variadic "any")
 RETURNS agtype
 LANGUAGE c
-STABLE
+IMMUTABLE
 RETURNS NULL ON NULL INPUT
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
@@ -3509,7 +3515,7 @@ AS 'MODULE_PATHNAME';
 CREATE FUNCTION ag_catalog.age_tostring(variadic "any")
 RETURNS agtype
 LANGUAGE c
-STABLE
+IMMUTABLE
 RETURNS NULL ON NULL INPUT
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
@@ -3517,7 +3523,7 @@ AS 'MODULE_PATHNAME';
 CREATE FUNCTION ag_catalog.age_size(variadic "any")
 RETURNS agtype
 LANGUAGE c
-STABLE
+IMMUTABLE
 RETURNS NULL ON NULL INPUT
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
@@ -4136,14 +4142,14 @@ AS 'MODULE_PATHNAME';
 CREATE FUNCTION ag_catalog.age_range(variadic "any")
 RETURNS agtype
 LANGUAGE c
-STABLE
+IMMUTABLE
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
 
 CREATE FUNCTION ag_catalog.age_unnest(agtype, block_types boolean = false)
     RETURNS SETOF agtype
     LANGUAGE c
-    STABLE
+    IMMUTABLE
 PARALLEL SAFE
 AS 'MODULE_PATHNAME';
 
