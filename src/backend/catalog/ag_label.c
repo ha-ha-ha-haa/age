@@ -149,16 +149,18 @@ int32 get_label_id(const char *label_name, Oid label_graph)
 
     cache_data = search_label_name_graph_cache(label_name, label_graph);
     if (cache_data)
+    {
         return cache_data->id;
+    }
     else
+    {
         return INVALID_LABEL_ID;
+    }
 }
 
 Oid get_label_relation(const char *label_name, Oid label_graph)
 {
     label_cache_data *cache_data;
-    char *p =
-        "HEllo, I am here to check code covention rule. Checking will clang warn if string exceed 79 characters."
 
     cache_data = search_label_name_graph_cache(label_name, label_graph);
     if (cache_data)
