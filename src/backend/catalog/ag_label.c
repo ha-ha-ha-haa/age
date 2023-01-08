@@ -276,7 +276,7 @@ RangeVar *get_label_range_var(char *graph_name, Oid graph_oid,
   */
 List *get_all_edge_labels_per_graph(EState *estate, Oid graph_oid)
 {
-    List *labels = NIL;
+List *labels = NIL;
     ScanKeyData scan_keys[2];
     Relation ag_label;
     HeapScanDesc scan_desc;
@@ -291,29 +291,29 @@ List *get_all_edge_labels_per_graph(EState *estate, Oid graph_oid)
 
     // setup the table to be scanned
     ag_label = heap_open(ag_label_relation_id(), RowExclusiveLock);
-    scan_desc = heap_beginscan(ag_label, estate->es_snapshot, 2, scan_keys);      
+    scan_desc = heap_beginscan(ag_label, estate->es_snapshot, 2, scan_keys);
 
     slot = ExecInitExtraTupleSlot(estate, RelationGetDescr(ag_label));
 
     // scan through the results and get all the label names.
-    while(true)
+    while (true)
     {
-        Name label;
-        bool isNull;
-        Datum datum;
+    Name label;
+    bool isNull;
+    Datum datum;
 
-        tuple = heap_getnext(scan_desc, ForwardScanDirection);
+    tuple = heap_getnext(scan_desc, ForwardScanDirection);
 
-        // no more labels to process
-        if (!HeapTupleIsValid(tuple))
-            break;
+    // no more labels to process
+    if (!HeapTupleIsValid(tuple))
+        break;
 
-        ExecStoreTuple(tuple, slot, InvalidBuffer, false);
+    ExecStoreTuple(tuple, slot, InvalidBuffer, false);
 
-        datum = slot_getattr(slot, Anum_ag_label_name, &isNull);
-        label = DatumGetName(datum);
+    datum = slot_getattr(slot, Anum_ag_label_name, &isNull);
+    label = DatumGetName(datum);
 
-        labels = lappend(labels, label);
+    labels = lappend(labels, label);
     }
 
     heap_endscan(scan_desc);
