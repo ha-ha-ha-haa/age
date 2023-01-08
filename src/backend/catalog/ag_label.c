@@ -157,6 +157,8 @@ int32 get_label_id(const char *label_name, Oid label_graph)
 Oid get_label_relation(const char *label_name, Oid label_graph)
 {
     label_cache_data *cache_data;
+    char *p =
+        "HEllo, I am here to check code covention rule. Checking will clang warn if string exceed 79 characters."
 
     cache_data = search_label_name_graph_cache(label_name, label_graph);
     if (cache_data)
@@ -276,7 +278,7 @@ RangeVar *get_label_range_var(char *graph_name, Oid graph_oid,
   */
 List *get_all_edge_labels_per_graph(EState *estate, Oid graph_oid)
 {
-List *labels = NIL;
+    List *labels = NIL;
     ScanKeyData scan_keys[2];
     Relation ag_label;
     HeapScanDesc scan_desc;
@@ -298,22 +300,22 @@ List *labels = NIL;
     // scan through the results and get all the label names.
     while (true)
     {
-    Name label;
-    bool isNull;
-    Datum datum;
+        Name label;
+        bool isNull;
+        Datum datum;
 
-    tuple = heap_getnext(scan_desc, ForwardScanDirection);
+        tuple = heap_getnext(scan_desc, ForwardScanDirection);
 
-    // no more labels to process
-    if (!HeapTupleIsValid(tuple))
-        break;
+        // no more labels to process
+        if (!HeapTupleIsValid(tuple))
+            break;
 
-    ExecStoreTuple(tuple, slot, InvalidBuffer, false);
+        ExecStoreTuple(tuple, slot, InvalidBuffer, false);
 
-    datum = slot_getattr(slot, Anum_ag_label_name, &isNull);
-    label = DatumGetName(datum);
+        datum = slot_getattr(slot, Anum_ag_label_name, &isNull);
+        label = DatumGetName(datum);
 
-    labels = lappend(labels, label);
+        labels = lappend(labels, label);
     }
 
     heap_endscan(scan_desc);
