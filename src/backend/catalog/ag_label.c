@@ -297,8 +297,7 @@ List *get_all_edge_labels_per_graph(EState *estate, Oid graph_oid)
                 RelationGetDescr(ag_label));
 
     // scan through the results and get all the label names.
-    while(true)
-    {
+    while(true){
         Name label;
         bool isNull;
         Datum datum;
