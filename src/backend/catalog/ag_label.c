@@ -291,13 +291,13 @@ List *get_all_edge_labels_per_graph(EState *estate, Oid graph_oid)
 
     // setup the table to be scanned
     ag_label = heap_open(ag_label_relation_id(), RowExclusiveLock);
-    scan_desc = heap_beginscan(ag_label, estate->es_snapshot, 2, scan_keys);
+    scan_desc = heap_beginscan(ag_label, estate->es_snapshot, 2, scan_keys);      
 
-    slot = ExecInitExtraTupleSlot(estate,
-                RelationGetDescr(ag_label));
+    slot = ExecInitExtraTupleSlot(estate, RelationGetDescr(ag_label));
 
     // scan through the results and get all the label names.
-    while(true){
+    while(true)
+    {
         Name label;
         bool isNull;
         Datum datum;
