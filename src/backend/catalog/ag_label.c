@@ -56,10 +56,8 @@ Oid insert_label(const char *label_name, Oid label_graph, int32 label_id,
     HeapTuple tuple;
     Oid label_oid;
 
-    /*
-     * NOTE: Is it better to make use of label_id and label_kind domain types
-     *       than to use assert to check label_id and label_kind are valid?
-     */
+    /*NOTE: Is it better to make use of label_id and label_kind domain types
+      than to use assert to check label_id and label_kind are valid? */
     AssertArg(label_name);
     AssertArg(OidIsValid(label_graph));
     AssertArg(label_id_is_valid(label_id));
@@ -149,13 +147,9 @@ int32 get_label_id(const char *label_name, Oid label_graph)
 
     cache_data = search_label_name_graph_cache(label_name, label_graph);
     if (cache_data)
-    {
         return cache_data->id;
-    }
     else
-    {
         return INVALID_LABEL_ID;
-    }
 }
 
 Oid get_label_relation(const char *label_name, Oid label_graph)
