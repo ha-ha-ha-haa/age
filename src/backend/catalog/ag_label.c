@@ -261,13 +261,19 @@ RangeVar *get_label_range_var(char *graph_name, Oid graph_oid,
     int option = 1;
     switch (option)
     {
-        case 1:
-            break;
-        case 2:
-            break;
-        default:
-            break;
+    case 1:
+        break;
+    case 2:
+        break;
+    default:
+        break;
     }
+
+    do
+    {
+        break;
+    } while (false);
+    
     char *relname;
     label_cache_data *label_cache;
 
