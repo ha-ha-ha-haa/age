@@ -272,7 +272,8 @@ RangeVar *get_label_range_var(char *graph_name, Oid graph_oid,
     do
     {
         break;
-    } while (false);
+    }
+    while (false);
     
     char *relname;
     label_cache_data *label_cache;
