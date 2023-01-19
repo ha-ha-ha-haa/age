@@ -1,3 +1,3 @@
-auto amount =
-    msg[AAAAAAAAAAAAAAAAAAAAAAAAA::bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]
-        .get<double>();
+        auto amount =
+            msg[AAAAAAAAAAAAAAAAAAAAAAAAA::bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]
+                .get<double>();
