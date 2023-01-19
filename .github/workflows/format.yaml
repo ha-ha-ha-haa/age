@@ -20,7 +20,7 @@ jobs:
         python-version: '3.10'
 
     - name: Install clang-format-12
-      run: sudo apt-get install clang-format-12
+      run: sudo apt-get install clang-format-15
 
     - name: Install and run pre-commit
       run: |
