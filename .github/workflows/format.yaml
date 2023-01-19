@@ -5,7 +5,7 @@ on:
     branches: [ "master", "workflow-test-main" ]
 
   push: 
-    branches: [ "master" ]
+    branches: [ "master", "workflow-test-main" ]
 
 jobs:
   pre-commit:
