@@ -36,4 +36,5 @@ PenaltyBreakFirstLessLess: 120
 PenaltyBreakOpenParenthesis: 0
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
+ColumnLimit: 0
 IndentWidth: 4
