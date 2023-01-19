@@ -5,7 +5,7 @@ int main() {
     {
         auto amount =
             msg[AAAAAAAAAAAAAAAAAAAAAAAAA::bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]
-            .get<double>();
+                .get<double>();
     }
 }
     
