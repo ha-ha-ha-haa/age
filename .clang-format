@@ -30,11 +30,10 @@ BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ObjCBreakBeforeNestedBlockParam: true
 PenaltyBreakAssignment: 2
-PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakBeforeFirstCallParameter: 1000
 PenaltyBreakComment: 300
 PenaltyBreakFirstLessLess: 120
 PenaltyBreakOpenParenthesis: 0
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
-ColumnLimit: 0
 IndentWidth: 4
