@@ -16,7 +16,7 @@ jobs:
           path: ~/pg12
           key: ${{ runner.os }}-v1-pg12-${{ env.PG_COMMIT_HASH }}
 
-      - uses: uraimo/run-on-arch-action@v3
+      - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         if: steps.pg12cache.outputs.cache-hit != 'true'
         id: runcmd
@@ -41,7 +41,7 @@ jobs:
             make install -j$(nproc)
 
       - uses: actions/checkout@v3
-      - uses: uraimo/run-on-arch-action@v3
+      - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         with:
           arch: aarch64
