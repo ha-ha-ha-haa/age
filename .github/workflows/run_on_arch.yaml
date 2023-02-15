@@ -18,6 +18,7 @@ jobs:
 
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
+        if: steps.pg12cache.outputs.cache-hit != 'true'
         id: runcmd
         with:
           arch: aarch64
