@@ -52,7 +52,7 @@ jobs:
           githubToken: ${{ github.token }}
 
           run: |
-            cd ~
+            ls ~
             ls
 
       - name: Get the output
