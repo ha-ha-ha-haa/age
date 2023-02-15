@@ -16,7 +16,7 @@ jobs:
           path: ~/pg12
           key: ${{ runner.os }}-v1-pg12-${{ env.PG_COMMIT_HASH }}
 
-      - uses: uraimo/run-on-arch-action@v2
+      - uses: uraimo/run-on-arch-action@v3
         name: Run commands
         if: steps.pg12cache.outputs.cache-hit != 'true'
         id: runcmd
@@ -39,6 +39,21 @@ jobs:
             cd ~/pg12source
             ./configure --prefix=$HOME/pg12 CFLAGS="-std=gnu99 -ggdb -O0" --enable-cassert
             make install -j$(nproc)
+
+      - uses: actions/checkout@v3
+      - uses: uraimo/run-on-arch-action@v3
+        name: Run commands
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          run: |
+            cd ~
+            ls
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
