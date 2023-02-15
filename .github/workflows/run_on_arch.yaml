@@ -34,6 +34,10 @@ jobs:
           # Set an output parameter `uname` for use in subsequent steps
           run: |
             uname -a
+            git clone --depth 1 --branch REL_12_STABLE git://git.postgresql.org/git/postgresql.git ~/pg12source
+            cd ~/pg12source
+            ./configure --prefix=$HOME/pg12 CFLAGS="-std=gnu99 -ggdb -O0" --enable-cassert
+            make install -j$(nproc)
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
