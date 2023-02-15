@@ -3,8 +3,8 @@ on: [push, pull_request]
 jobs:
   armv7_job:
     # The host should always be Linux
-    runs-on: ubuntu-18.04
-    name: Build on ubuntu-18.04 armv7
+    runs-on: ubuntu-20.04
+    name: Build on ubuntu-20.04 armv7
     steps:
       - uses: actions/checkout@v3
       - uses: uraimo/run-on-arch-action@v2
@@ -12,7 +12,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu18.04
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -21,9 +21,8 @@ jobs:
           # Set an output parameter `uname` for use in subsequent steps
           run: |
             uname -a
-            echo ::set-output name=uname::$(uname -a)
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
         run: |
-          echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
+          uname -a
