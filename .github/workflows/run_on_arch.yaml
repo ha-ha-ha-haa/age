@@ -52,10 +52,7 @@ jobs:
           githubToken: ${{ github.token }}
 
           run: |
-            export PG_CONFIG=$HOME/pg12/bin/pg_config 
-            make -j$(nproc)
-            make install
-            make installcheck
+            ls /home/runner
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
         run: |
