@@ -51,8 +51,9 @@ jobs:
           githubToken: ${{ github.token }}
 
           run: |
-            cd /home/runner
+            cd ~/pg12source
             ls
+            $(pwd)
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
         run: |
