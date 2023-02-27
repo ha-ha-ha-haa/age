@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/taha-linux/Desktop/blog_installation/postgresql-11.17/src/include",
+                "/home/taha-linux/Desktop/blog_installation/postgresql-11.17/src/backend",
+                "/home/taha-linux/Desktop/blog_installation/for_predicate/age2/src/include",
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
