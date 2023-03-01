@@ -8,7 +8,7 @@
             "name": "(gdb) Attach DB",
             "type": "cppdbg",
             "request": "attach",
-            "program": "/home/taha-linux/Desktop/blog_installation/postgresql-11.17/bin/postgres",
+            "program": "/home/taha-linux/Desktop/blog_installation/postgresql-11.17/pgsql/bin/postgres",
             "MIMode": "gdb",
             "targetArchitecture": "arm64"
         },

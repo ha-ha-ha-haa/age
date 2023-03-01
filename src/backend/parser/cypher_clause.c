@@ -2645,7 +2645,7 @@ static Query *transform_cypher_sub_pattern(cypher_parsestate *cpstate,
 
     cypher_parsestate *child_parse_state = make_cypher_parsestate(cpstate);
     ParseState *p_child_parse_state = (ParseState *) child_parse_state;
-    p_child_parse_state->p_expr_kind = pstate->p_expr_kind;
+    p_child_parse_state->p_expr_kind = EXPR_KIND_OTHER;
 
     /* create a cypher match node and assign it the sub pattern */
     match = make_ag_node(cypher_match);
@@ -5142,7 +5142,8 @@ transform_cypher_clause_as_subquery(cypher_parsestate *cpstate,
     Assert(pstate->p_expr_kind == EXPR_KIND_NONE ||
            pstate->p_expr_kind == EXPR_KIND_OTHER ||
            pstate->p_expr_kind == EXPR_KIND_WHERE ||
-           pstate->p_expr_kind == EXPR_KIND_FROM_SUBSELECT);
+           pstate->p_expr_kind == EXPR_KIND_FROM_SUBSELECT ||
+           pstate->p_expr_kind == EXPR_KIND_SELECT_TARGET);
 
     /*
      * As these are all sub queries, if this is just of type NONE, note it as a

@@ -1725,6 +1725,13 @@ list:
 
             $$ = (Node *)n;
         }
+    | '[' expr_filter ']'
+        {
+            cypher_list_comp *lc = (cypher_list_comp *) $1;
+
+            lc->location = @1;
+            $$ = $1;
+        }
     ;
 
 expr_case:
@@ -1787,6 +1794,19 @@ expr_case_default:
             $$ = NULL;
         }
     ;
+
+expr_filter:
+    var_name IN expr where_opt
+        {
+            cypher_list_comp *lc;
+
+            lc = make_ag_node(cypher_list_comp);
+            lc->list = $3;
+            lc->var_name = $1;
+            lc->where = $4;
+            $$ = (Node *) lc;
+        }
+;
 
 expr_var:
     var_name
