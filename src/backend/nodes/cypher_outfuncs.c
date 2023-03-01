@@ -257,6 +257,17 @@ void out_cypher_list(StringInfo str, const ExtensibleNode *node)
     WRITE_LOCATION_FIELD(location);
 }
 
+// serialization function for the cypher_list_comp ExtensibleNode.
+void out_cypher_list_comp(StringInfo str, const ExtensibleNode *node)
+{
+    DEFINE_AG_NODE(cypher_list_comp);
+
+    WRITE_NODE_FIELD(list);
+    WRITE_STRING_FIELD(var_name);
+    WRITE_NODE_FIELD(where);
+    WRITE_LOCATION_FIELD(location);
+}
+
 // serialization function for the cypher_string_match ExtensibleNode.
 void out_cypher_string_match(StringInfo str, const ExtensibleNode *node)
 {

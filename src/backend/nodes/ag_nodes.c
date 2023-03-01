@@ -60,7 +60,8 @@ const char *node_names[] = {
     "cypher_update_item",
     "cypher_delete_information",
     "cypher_delete_item",
-    "cypher_merge_information"
+    "cypher_merge_information",
+    "cypher_list_comp"
 };
 
 /*
@@ -116,6 +117,7 @@ const ExtensibleNodeMethods node_methods[] = {
     DEFINE_NODE_METHODS(cypher_integer_const),
     DEFINE_NODE_METHODS(cypher_sub_pattern),
     DEFINE_NODE_METHODS(cypher_call),
+    DEFINE_NODE_METHODS(cypher_list_comp),
     DEFINE_NODE_METHODS_EXTENDED(cypher_create_target_nodes),
     DEFINE_NODE_METHODS_EXTENDED(cypher_create_path),
     DEFINE_NODE_METHODS_EXTENDED(cypher_target_node),

@@ -251,6 +251,17 @@ typedef struct cypher_call
     List *yield_items; // optional yield subclause
 } cypher_call;
 
+// make struct for cypher_list_comp
+
+typedef struct cypher_list_comp
+{
+    ExtensibleNode extensible;
+    char *var_name;
+    Node *where;
+    List *list;
+    int location;
+} cypher_list_comp;
+
 #define CYPHER_CLAUSE_FLAG_NONE 0x0000
 #define CYPHER_CLAUSE_FLAG_TERMINAL 0x0001
 #define CYPHER_CLAUSE_FLAG_PREVIOUS_CLAUSE 0x0002

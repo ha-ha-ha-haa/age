@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.inc": "c",
+        "array": "c",
+        "compare": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "*.tcc": "c",
+        "algorithm": "c",
+        "random": "c",
+        "numeric": "c"
+    }
+}

@@ -52,7 +52,7 @@ void out_cypher_bool_const(StringInfo str, const ExtensibleNode *node);
 void out_cypher_param(StringInfo str, const ExtensibleNode *node);
 void out_cypher_map(StringInfo str, const ExtensibleNode *node);
 void out_cypher_list(StringInfo str, const ExtensibleNode *node);
-
+void out_cypher_list_comp(StringInfo str, const ExtensibleNode *node);
 // string match
 void out_cypher_string_match(StringInfo str, const ExtensibleNode *node);
 
