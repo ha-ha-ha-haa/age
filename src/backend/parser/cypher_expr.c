@@ -310,6 +310,19 @@ static Node *transform_ColumnRef(cypher_parsestate *cpstate, ColumnRef *cref)
                 Assert(IsA(field1, String));
                 colname = strVal(field1);
 
+                /*
+                 * Try to find the columnRef as a
+                 * transform_entity and extract the expr if 
+                 * it is declared in current clause.
+                 */
+                
+                te = find_variable(cpstate, colname) ;
+                if (te != NULL && te->expr != NULL && te->declared_in_current_clause)
+                {
+                    node = (Node *)te->expr;
+                    break;
+                }
+
                 /* Try to identify as an unqualified column */
                 node = colNameToVar(pstate, colname, false, cref->location);
                 if (node != NULL)
@@ -317,19 +330,6 @@ static Node *transform_ColumnRef(cypher_parsestate *cpstate, ColumnRef *cref)
                         break;
                 }
 
-                /*
-                 * If expr_kind is WHERE, Try to find the columnRef as a
-                 * transform_entity and extract the expr.
-                 */
-                if (pstate->p_expr_kind == EXPR_KIND_WHERE)
-                {
-                    te = find_variable(cpstate, colname) ;
-                    if (te != NULL && te->expr != NULL)
-                    {
-                        node = (Node *)te->expr;
-                        break;
-                    }
-                }
                 /*
                  * Not known as a column of any range-table entry.
                  * Try to find the name as a relation.  Note that only

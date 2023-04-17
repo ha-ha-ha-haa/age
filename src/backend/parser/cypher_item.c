@@ -33,6 +33,7 @@
 #include "parser/parse_node.h"
 #include "parser/parse_relation.h"
 #include "parser/parse_target.h"
+#include "parser/cypher_transform_entity.h"
 
 #include "parser/cypher_expr.h"
 #include "parser/cypher_item.h"
@@ -68,6 +69,7 @@ List *transform_cypher_item_list(cypher_parsestate *cpstate, List *item_list,
     List *group_clause = NIL;
     bool hasAgg = false;
     bool expand_star;
+    transform_entity *entity;
 
     expand_star = (expr_kind != EXPR_KIND_UPDATE_SOURCE);
 
@@ -109,6 +111,10 @@ List *transform_cypher_item_list(cypher_parsestate *cpstate, List *item_list,
         te = transform_cypher_item(cpstate, item->val, NULL, expr_kind,
                                    item->name, false);
 
+        entity = make_transform_entity(cpstate, ENT_RESTARGET, (Node *)item,
+                                       te->expr);
+
+        cpstate->entities = list_concat(list_make1(entity), cpstate->entities);
         target_list = lappend(target_list, te);
 
         /*

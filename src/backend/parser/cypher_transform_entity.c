@@ -39,6 +39,10 @@ transform_entity *make_transform_entity(cypher_parsestate *cpstate,
     {
         entity->entity.rel = (cypher_relationship *)node;
     }
+    else if (entity->type == ENT_RESTARGET)
+    {
+        entity->entity.target = (ResTarget *) node;
+    }
     else
     {
         ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
@@ -90,6 +94,13 @@ transform_entity *find_transform_entity(cypher_parsestate *cpstate,
                 return entity;
             }
         }
+        else if (type == ENT_RESTARGET)
+        {
+            if (entity->entity.target->name != NULL && !strcmp(entity->entity.target->name, name))
+            {
+                return entity;
+            }
+        }
     }
 
     return NULL;
@@ -116,6 +127,10 @@ transform_entity *find_variable(cypher_parsestate *cpstate, char *name)
         {
             entity_name = entity->entity.rel->name;
         }
+        else if (entity->type == ENT_RESTARGET)
+        {
+            entity_name = entity->entity.target->name;
+        }
         else
         {
             ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
@@ -141,6 +156,10 @@ char *get_entity_name(transform_entity *entity)
     else if (entity->type == ENT_VERTEX)
     {
         return entity->entity.node->name;
+    }
+    else if (entity->type == ENT_RESTARGET)
+    {
+        return entity->entity.target->name;
     }
     else
     {
