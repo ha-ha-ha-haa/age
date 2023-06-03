@@ -6024,8 +6024,9 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
 
     if (edge->name != NULL)
     {
-        transform_entity *entity = find_transform_entity(cpstate, edge->name,
-                                                         ENT_EDGE);
+        transform_entity *entity;
+        
+        entity = find_variable(cpstate, edge->name);
 
         // We found a variable with this variable name, throw an error.
         if (entity != NULL)
@@ -6044,6 +6045,24 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
         edge->name = get_next_default_alias(cpstate);
     }
 
+    if (!edge->label)
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                 errmsg("edges declared in a MERGE clause must have a label"),
+                 parser_errposition(&cpstate->pstate, edge->location)));
+    }
+    else
+    {
+        if (get_label_kind(edge->label, cpstate->graph_oid) == LABEL_KIND_VERTEX)
+        {
+            ereport(ERROR,
+                    (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                     errmsg("label %s is for vertices, not edges", edge->label),
+                     parser_errposition(pstate, edge->location)));
+        }
+    }
+    
     rel->type = LABEL_KIND_EDGE;
 
     // all edges are marked with insert
@@ -6053,15 +6072,6 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
     rel->resultRelInfo = NULL;
 
     rel->dir = edge->dir;
-
-    if (!edge->label)
-    {
-        ereport(ERROR,
-                (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                 errmsg("edges declared in a MERGE clause must have a label"),
-                 parser_errposition(&cpstate->pstate, edge->location)));
-    }
-
 
     // check to see if the label exists, create the label entry if it does not.
     if (edge->label && !label_exists(edge->label, cpstate->graph_oid))
@@ -6086,21 +6096,6 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
     // lock the relation of the label
     rv = makeRangeVar(cpstate->graph_name, edge->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
-
-    /*
-     * TODO
-     * It is possible for a vertex label to be retrieved, instead of an edge,
-     * due to the above logic. So, we need to check if it is a vertex label.
-     * This whole section needs to be fixed because it could be a relation that
-     * isn't either and has the correct number of columns. However, for now,
-     * we just check the number of columns.
-     */
-    if (label_relation->rd_att->natts == 2) // TODO temporarily hardcoded
-    {
-        ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                        errmsg("Expecting edge label, found existing vertex label"),
-                        parser_errposition(&cpstate->pstate, edge->location)));
-    }
 
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
@@ -6130,6 +6125,7 @@ static cypher_target_node *
 transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
                             cypher_node *node)
 {
+    ParseState *pstate = (ParseState *)cpstate;
     cypher_target_node *rel = make_ag_node(cypher_target_node);
     Relation label_relation;
     RangeVar *rv;
@@ -6147,13 +6143,13 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
          */
         if (entity != NULL)
         {
-                rel->type = LABEL_KIND_VERTEX;
-                rel->tuple_position = InvalidAttrNumber;
-                rel->variable_name = node->name;
-                rel->resultRelInfo = NULL;
+            rel->type = LABEL_KIND_VERTEX;
+            rel->tuple_position = InvalidAttrNumber;
+            rel->variable_name = node->name;
+            rel->resultRelInfo = NULL;
 
-                rel->flags |= CYPHER_TARGET_NODE_MERGE_EXISTS;
-                return rel;
+            rel->flags |= CYPHER_TARGET_NODE_MERGE_EXISTS;
+            return rel;
         }
         rel->flags |= CYPHER_TARGET_NODE_IS_VAR;
     }
@@ -6179,6 +6175,13 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
     }
     else
     {
+        if (get_label_kind(node->label, cpstate->graph_oid) == LABEL_KIND_EDGE)
+        {
+            ereport(ERROR,
+                    (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                     errmsg("label %s is for edges, not vertices", node->label),
+                     parser_errposition(pstate, node->location)));
+        }
         rel->label_name = node->label;
     }
 
@@ -6206,21 +6209,6 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
 
     rv = makeRangeVar(cpstate->graph_name, node->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
-
-    /*
-     * TODO
-     * It is possible for an edge label to be retrieved, instead of a vertex,
-     * due to the above logic. So, we need to check if it is an edge label.
-     * This whole section needs to be fixed because it could be a relation that
-     * isn't either and has the correct number of columns. However, for now,
-     * we just check the number of columns.
-     */
-    if (label_relation->rd_att->natts == 4) // TODO temporarily hardcoded
-    {
-        ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                        errmsg("Expecting vertex label, found existing edge label"),
-                        parser_errposition(&cpstate->pstate, node->location)));
-    }
 
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
