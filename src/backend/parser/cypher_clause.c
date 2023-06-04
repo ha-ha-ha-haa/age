@@ -6032,12 +6032,10 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
         if (entity != NULL)
         {
             ereport(ERROR,
-                (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                 errmsg("variable %s already exists", edge->name),
-                 parser_errposition(pstate, edge->location)));
+                   (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                    errmsg("variable %s already exists", edge->name),
+                    parser_errposition(pstate, edge->location)));
         }
-
-        rel->flags |= CYPHER_TARGET_NODE_IS_VAR;
     }
     else
     {
@@ -6045,59 +6043,53 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
         edge->name = get_next_default_alias(cpstate);
     }
 
-    if (!edge->label)
+    if (edge->label)
+    {
+        if (get_label_kind(edge->label, cpstate->graph_oid) == LABEL_KIND_VERTEX)
+        {
+            ereport(ERROR,
+                   (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                    errmsg("label %s is for vertices, not edges", edge->label),
+                    parser_errposition(pstate, edge->location)));
+        }
+
+        // check to see if the label exists, create the label entry if it does not.
+        if (!label_exists(edge->label, cpstate->graph_oid))
+        {
+            List *parent;
+            RangeVar *rv;
+
+            /*
+             * setup the default edge table as the parent table, that we
+             * will inherit from.
+             */
+            rv = get_label_range_var(cpstate->graph_name, cpstate->graph_oid,
+                                        AG_DEFAULT_LABEL_EDGE);
+
+            parent = list_make1(rv);
+
+            // create the label
+            create_label(cpstate->graph_name, edge->label, LABEL_TYPE_EDGE,
+                         parent);
+        }
+    }
+    else
     {
         ereport(ERROR,
                 (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
                  errmsg("edges declared in a MERGE clause must have a label"),
                  parser_errposition(&cpstate->pstate, edge->location)));
     }
-    else
-    {
-        if (get_label_kind(edge->label, cpstate->graph_oid) == LABEL_KIND_VERTEX)
-        {
-            ereport(ERROR,
-                    (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                     errmsg("label %s is for vertices, not edges", edge->label),
-                     parser_errposition(pstate, edge->location)));
-        }
-    }
-    
-    rel->type = LABEL_KIND_EDGE;
-
-    // all edges are marked with insert
-    rel->flags |= CYPHER_TARGET_NODE_FLAG_INSERT;
-    rel->label_name = edge->label;
-    rel->variable_name = edge->name;
-    rel->resultRelInfo = NULL;
-
-    rel->dir = edge->dir;
-
-    // check to see if the label exists, create the label entry if it does not.
-    if (edge->label && !label_exists(edge->label, cpstate->graph_oid))
-    {
-        List *parent;
-        RangeVar *rv;
-
-        /*
-         * setup the default edge table as the parent table, that we
-         * will inherit from.
-         */
-        rv = get_label_range_var(cpstate->graph_name, cpstate->graph_oid,
-                                 AG_DEFAULT_LABEL_EDGE);
-
-        parent = list_make1(rv);
-
-        // create the label
-        create_label(cpstate->graph_name, edge->label, LABEL_TYPE_EDGE,
-                     parent);
-    }
 
     // lock the relation of the label
     rv = makeRangeVar(cpstate->graph_name, edge->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
 
-        // Verify if we opened the correct relation by checking if label matches relation name and parent is _ag_label_vertex
+    /*
+     * Verify if we opened the correct relation by checking if label matches
+     * relation name. Also check if the relation has the correct number of
+     * attributes.
+     */
     if (strcmp(RelationGetRelationName(label_relation), edge->label) != 0 ||
         label_relation->rd_rel->relnatts != 4)
     {
@@ -6107,6 +6099,17 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
                         RelationGetRelationName(label_relation), edge->label),
                  parser_errposition(pstate, edge->location)));
     }
+
+
+    rel->type = LABEL_KIND_EDGE;
+
+    // all edges are marked with insert
+    rel->flags |= CYPHER_TARGET_NODE_FLAG_INSERT;
+    rel->label_name = edge->label;
+    rel->variable_name = edge->name;
+    rel->resultRelInfo = NULL;
+
+    rel->dir = edge->dir;
 
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
@@ -6149,8 +6152,8 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
                                                          ENT_VERTEX);
 
         /*
-         *  the vertex was previously declared, we do not need to do any setup
-         *  to create the node.
+         * the vertex was previously declared, we do not need to do any setup
+         * to create the node.
          */
         if (entity != NULL)
         {
@@ -6170,58 +6173,56 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
         node->name = get_next_default_alias(cpstate);
     }
 
-    rel->type = LABEL_KIND_VERTEX;
-    rel->tuple_position = InvalidAttrNumber;
-    rel->variable_name = node->name;
-    rel->resultRelInfo = NULL;
-
-    if (!node->label)
-    {
-        rel->label_name = "";
-        /*
-         *  If no label is specified, assign the generic label name that
-         *  all labels are descendents of.
-         */
-        node->label = AG_DEFAULT_LABEL_VERTEX;
-    }
-    else
+    if (node->label)
     {
         if (get_label_kind(node->label, cpstate->graph_oid) == LABEL_KIND_EDGE)
         {
             ereport(ERROR,
-                    (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-                     errmsg("label %s is for edges, not vertices", node->label),
-                     parser_errposition(pstate, node->location)));
+                   (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+                    errmsg("label %s is for edges, not vertices", node->label),
+                    parser_errposition(pstate, node->location)));
         }
+
         rel->label_name = node->label;
-    }
+        
+        // check to see if the label exists, create the label entry if it does not.
+        if (!label_exists(node->label, cpstate->graph_oid))
+        {
+            List *parent;
+            RangeVar *rv;
 
-    // check to see if the label exists, create the label entry if it does not.
-    if (node->label && !label_exists(node->label, cpstate->graph_oid))
+            /*
+             * setup the default vertex table as the parent table, that we
+             * will inherit from.
+             */
+            rv = get_label_range_var(cpstate->graph_name, cpstate->graph_oid,
+                                        AG_DEFAULT_LABEL_VERTEX);
+
+            parent = list_make1(rv);
+
+            // create the label
+            create_label(cpstate->graph_name, node->label, LABEL_TYPE_VERTEX,
+                         parent);
+        }
+    }
+    else
     {
-        List *parent;
-        RangeVar *rv;
-
+        rel->label_name = "";
         /*
-         * setup the default vertex table as the parent table, that we
-         * will inherit from.
+         * If no label is specified, assign the generic label name that
+         * all labels are descendents of.
          */
-        rv = get_label_range_var(cpstate->graph_name, cpstate->graph_oid,
-                                 AG_DEFAULT_LABEL_VERTEX);
-
-        parent = list_make1(rv);
-
-        // create the label
-        create_label(cpstate->graph_name, node->label, LABEL_TYPE_VERTEX,
-                     parent);
+        node->label = AG_DEFAULT_LABEL_VERTEX;
     }
-
-    rel->flags |= CYPHER_TARGET_NODE_FLAG_INSERT;
 
     rv = makeRangeVar(cpstate->graph_name, node->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
 
-    // Verify if we opened the correct relation by checking if label matches relation name and parent is _ag_label_vertex
+    /*
+     * Verify if we opened the correct relation by checking if label matches
+     * relation name. Also check if the relation has the correct number of
+     * attributes.
+     */
     if (strcmp(RelationGetRelationName(label_relation), node->label) != 0 ||
         label_relation->rd_rel->relnatts != 2)
     {
@@ -6231,6 +6232,13 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
                         RelationGetRelationName(label_relation), node->label),
                  parser_errposition(pstate, node->location)));
     }
+
+    rel->type = LABEL_KIND_VERTEX;
+    rel->tuple_position = InvalidAttrNumber;
+    rel->variable_name = node->name;
+    rel->resultRelInfo = NULL;
+    
+    rel->flags |= CYPHER_TARGET_NODE_FLAG_INSERT;
 
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
