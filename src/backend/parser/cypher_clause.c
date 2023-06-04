@@ -6097,6 +6097,17 @@ transform_merge_cypher_edge(cypher_parsestate *cpstate, List **target_list,
     rv = makeRangeVar(cpstate->graph_name, edge->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
 
+        // Verify if we opened the correct relation by checking if label matches relation name and parent is _ag_label_vertex
+    if (strcmp(RelationGetRelationName(label_relation), edge->label) != 0 ||
+        label_relation->rd_rel->relnatts != 4)
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_UNDEFINED_TABLE),
+                 errmsg("Unexpected relation %s found for label %s",
+                        RelationGetRelationName(label_relation), edge->label),
+                 parser_errposition(pstate, edge->location)));
+    }
+
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
 
@@ -6209,6 +6220,17 @@ transform_merge_cypher_node(cypher_parsestate *cpstate, List **target_list,
 
     rv = makeRangeVar(cpstate->graph_name, node->label, -1);
     label_relation = parserOpenTable(&cpstate->pstate, rv, RowExclusiveLock);
+
+    // Verify if we opened the correct relation by checking if label matches relation name and parent is _ag_label_vertex
+    if (strcmp(RelationGetRelationName(label_relation), node->label) != 0 ||
+        label_relation->rd_rel->relnatts != 2)
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_UNDEFINED_TABLE),
+                 errmsg("Unexpected relation %s found for label %s",
+                        RelationGetRelationName(label_relation), node->label),
+                 parser_errposition(pstate, node->location)));
+    }
 
     // Store the relid
     rel->relid = RelationGetRelid(label_relation);
