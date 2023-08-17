@@ -15,7 +15,7 @@ jobs:
           contains('["/sync"]', github.event.comment.body) &&
           contains('["MuhammadTahaNaveed"]', github.actor)
         env:
-          GITHUB_CONTEXT: ${{ toJson(steps) }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "Author and keyword verified.... Triggering event"
           echo "$GITHUB_CONTEXT"
