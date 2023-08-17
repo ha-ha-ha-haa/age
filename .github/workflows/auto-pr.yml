@@ -14,27 +14,35 @@ jobs:
         if: |                                                   # check the keyword and authors(TODO: use actor id for author verification)
           contains('["/sync"]', github.event.comment.body) &&
           contains('["MuhammadTahaNaveed"]', github.actor)
+        env:
+          PATCH_URL: ${{ github.event.issue.pull_request.patch_url }}
         run: |
           echo "Author and keyword verified.... Triggering event"
-          echo ${{github}}
+          echo "$PATCH_URL" > patch_url.txt
         
       - name: Exit the job if keyword and author unverified
         if: ${{ steps.trigger.conclusion == 'skipped' }}
         run: exit 1
 
-      # - name: Upload patch url as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: patch_url
-      #     path: patch_url.txt
+      - name: Upload patch url as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: patch_url
+          path: patch_url.txt
 
   SyncPR:
     needs: TriggerOnComment
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout
-        run: echo '$GITHUB_CONTEXT'
+      - name: Download patch_url extracted by previous job
+        uses: actions/download-artifact@v3
+        with:
+          name: patch_url
+        run: |
+          value=`cat patch_url.txt`
+          echo $value
+
       # - uses: actions/checkout@v3
       #   with:
       #     ref: PG15
