@@ -39,6 +39,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: patch_url
+      - name: read patch url 
         run: |
           value=`cat patch_url.txt`
           echo $value
