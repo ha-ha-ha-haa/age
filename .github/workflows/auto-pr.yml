@@ -9,26 +9,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: say hello
+      - name: Check Keyword and author
+        id: trigger
         if: |                                                   # check the keyword and authors
           contains('["/sync"]', github.event.comment.body) &&
           contains('["MuhammadTahaNaveed"]', github.actor)
         run: |
-          echo started automating PRs
+          echo "Author and keyword verified.... Triggering event"
+        
+      - name: Exit the job if keyword and author unverified
+        if: ${{ steps.trigger.conclusion == 'skipped' }}
+        run: exit 1
 
-  # productionPromotion:
-  #   needs: TriggerOnComment
-  #   runs-on: ubuntu-latest
+  SyncPR:
+    needs: TriggerOnComment
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         ref: PG15
-  #     - name: Reset promotion branch
-  #       run: |
-  #         git fetch origin auto-sync-pr
-  #         git reset --hard origin/auto-sync-pr
-  #     - name: Create Pull Request
-  #       uses: peter-evans/create-pull-request@v5
-  #       with:
-  #         branch: apply-pr
+    steps:
+      - name: lets check first
+        run: |
+          echo 'hello'
+      # - uses: actions/checkout@v3
+      #   with:
+      #     ref: PG15
+      # - name: Reset promotion branch
+      #   run: |
+      #     git fetch origin auto-sync-pr
+      #     git reset --hard origin/auto-sync-pr
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     branch: apply-pr
