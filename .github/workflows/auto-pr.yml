@@ -10,8 +10,9 @@ jobs:
 
     steps:
       - name: say hello
-        if: contains('["/sync"]', github.event.comment.body)      # check the comment if it contains the keywords
-        # if: contains(['MuhammadTahaNaveed'], 'github.actor')
+        if: |                                                   # check the keyword and authors
+          contains('["/sync"]', github.event.comment.body) &&
+          contains('["MuhammadTahaNaveed"]', github.actor)
         run: |
           echo started automating PRs
 
