@@ -11,11 +11,14 @@ jobs:
     steps:
       - name: Check Keyword and author
         id: trigger
-        if: |                                                   # check the keyword and authors
+        if: |                                                   # check the keyword and authors(TODO: use actor id for author verification)
           contains('["/sync"]', github.event.comment.body) &&
           contains('["MuhammadTahaNaveed"]', github.actor)
+        env:
+          GITHUB_CONTEXT: ${{ toJson(steps) }}
         run: |
           echo "Author and keyword verified.... Triggering event"
+          echo "$GITHUB_CONTEXT"
         
       - name: Exit the job if keyword and author unverified
         if: ${{ steps.trigger.conclusion == 'skipped' }}
@@ -26,9 +29,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: lets check first
-        run: |
-          echo 'hello'
+      - name: checkout
+        run: echo 'hello'
       # - uses: actions/checkout@v3
       #   with:
       #     ref: PG15
