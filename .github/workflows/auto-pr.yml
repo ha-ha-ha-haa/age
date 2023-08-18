@@ -20,15 +20,11 @@ jobs:
         if: ${{ steps.trigger.conclusion == 'skipped' }}
         run: exit 1
 
-  SyncPR:
+  GetPrAndCommitInfo:
     needs: TriggerOnComment
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Download patch_url extracted by previous job
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: patch_url
       - name: Get Pull Request and Commits Info
         id: pr_info
         run: |
@@ -42,8 +38,19 @@ jobs:
 
       - name: Display Pull Request and Commits Info
         run: |
-          cat pr_info.json
-          cat commits_info.json
+          commits=$(jq -c '.[]' commits_info.json)
+          while IFS= read -r commit; do
+            author_name=$(echo "$commit" | jq -r '.commit.author.name')
+            author_email=$(echo "$commit" | jq -r '.commit.author.email')
+            committer_name=$(echo "$commit" | jq -r '.commit.committer.name')
+            committer_email=$(echo "$commit" | jq -r '.commit.committer.email')
+            commit_message=$(echo "$commit" | jq -r '.commit.message')
+
+            # Use the retrieved values as needed, e.g., set environment variables
+            echo "Commit by: $author_name <$author_email>"
+            echo "Committer: $committer_name <$committer_email>"
+            echo "Message: $commit_message"
+          done <<< "$commits"
       # - name: Read patch url and set as environment variable
       #   env:
       #     PATCH_URL: ${{ toJson(github) }}
