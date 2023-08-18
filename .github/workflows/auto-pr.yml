@@ -29,11 +29,32 @@ jobs:
       #   uses: actions/download-artifact@v3
       #   with:
       #     name: patch_url
-      - name: Read patch url and set as environment variable
-        env:
-          PATCH_URL: ${{ toJson(github) }}
+      - name: Get Pull Request and Commits Info
+        id: pr_info
         run: |
-          echo "$PATCH_URL"
+          PR_NUMBER=$(echo "${{ github.event.issue.url }}" | awk -F'/' '{print $NF}')
+          PR_INFO=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          COMMITS_INFO=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits")
+          echo "::set-output name=pr_info::$PR_INFO"
+          echo "::set-output name=commits_info::$COMMITS_INFO"
+
+      - name: Display Pull Request and Commits Info
+        run: |
+          PR_INFO="${{ steps.pr_info.outputs.pr_info }}"
+          COMMITS_INFO="${{ steps.pr_info.outputs.commits_info }}"
+
+          echo "Pull Request Info:"
+          echo "$PR_INFO"
+          echo "Commits Info:"
+          echo "$COMMITS_INFO"
+      # - name: Read patch url and set as environment variable
+      #   env:
+      #     PATCH_URL: ${{ toJson(github) }}
+      #     COMITTER: ${{ github.actor }}
+      #   run: |
+      #     echo "$PATCH_URL"
 
       # - uses: actions/checkout@v3
       #   with:
