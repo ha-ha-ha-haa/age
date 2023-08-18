@@ -43,7 +43,7 @@ jobs:
         env:
           PATCH_URL: ${{ github.event.issue.pull_request.patch_url }}
         run: |
-          echo ${{PATCH_URL}}
+          echo "$PATCH_URL"
 
       # - uses: actions/checkout@v3
       #   with:
