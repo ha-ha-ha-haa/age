@@ -37,18 +37,13 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
           COMMITS_INFO=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits")
-          echo "PR_INFO=$PR_INFO" >> $GITHUB_ENV
-          echo "COMMITS_INFO=$COMMITS_INFO" >> $GITHUB_ENV
+          echo "$PR_INFO" > pr_info.json
+          echo "$COMMITS_INFO" > commits_info.json
 
       - name: Display Pull Request and Commits Info
         run: |
-          PR_INFO="${{ steps.pr_info.outputs.pr_info }}"
-          COMMITS_INFO="${{ steps.pr_info.outputs.commits_info }}"
-
-          echo "Pull Request Info:"
-          echo "$PR_INFO"
-          echo "Commits Info:"
-          echo "$COMMITS_INFO"
+          cat pr_info.json
+          cat commits_info.json
       # - name: Read patch url and set as environment variable
       #   env:
       #     PATCH_URL: ${{ toJson(github) }}
