@@ -35,27 +35,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download patch_url extracted by previous job
-        uses: actions/download-artifact@v3
-        with:
-          name: patch_url
+      # - name: Download patch_url extracted by previous job
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: patch_url
       - name: Read patch url and set as environment variable
+        env:
+          PATCH_URL: ${{ github.event.issue.pull_request.patch_url }}
         run: |
-          patch_url=$(cat patch_url.txt)
-          echo "PATCH_URL=$patch_url" >> $GITHUB_ENV
+          echo ${{PATCH_URL}}
 
-      - uses: actions/checkout@v3
-        with:
-          ref: PG11
-      - name: Create commit using patch for PG11 branch
-        run: |
-          curl -L $PATCH_URL | git apply -v
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: apply-pr-PG11     #this will contain the head branch name + PG11 + some keyword to indicate that this branch is created by github bot
+      # - uses: actions/checkout@v3
+      #   with:
+      #     ref: PG11
+      # - name: Create commit using patch for PG11 branch
+      #   run: |
+      #     curl -L $PATCH_URL | git apply -v
+      #     git config --global user.email "you@example.com"
+      #     git config --global user.name "Your Name"
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     branch: apply-pr-PG11     #this will contain the head branch name + PG11 + some keyword to indicate that this branch is created by github bot
 
       #    "patch_url": "https://github.com/MuhammadTahaNaveed/age/pull/79.patch",
 # # Download a patch and apply it.
