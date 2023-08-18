@@ -62,9 +62,9 @@ jobs:
           ref: PG11
       - name: Create commit using patch for PG11 branch
         run: |
-          curl -L "https://github.com/MuhammadTahaNaveed/age/pull/80.patch" | git am -3 --ignore-whitespace
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+          curl -L "https://github.com/MuhammadTahaNaveed/age/pull/80.patch" | git am -3 --ignore-whitespace
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
