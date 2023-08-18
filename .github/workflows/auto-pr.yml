@@ -62,7 +62,7 @@ jobs:
           ref: PG11
       - name: Create commit using patch for PG11 branch
         run: |
-          curl -L $PATCH_URL | git apply -v
+          curl -L "$PATCH_URL" | git apply -v
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
           git add .
