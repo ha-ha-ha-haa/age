@@ -49,7 +49,6 @@ jobs:
           ref: PG11
       - name: Create commit using patch for PG11 branch
         run: |
-          patch_url=`cat patch_url.txt`
           curl -L $PATCH_URL | git apply -v
           git add .
           git commit -m 'Applied PR [This will be original commit message.]'
