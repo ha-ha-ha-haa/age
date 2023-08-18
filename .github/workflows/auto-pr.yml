@@ -59,17 +59,17 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          ref: PG11
-      - name: Create commit using patch for PG11 branch
+          ref: master
+      - name: Create commit using patch for master branch
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
-          curl -L "https://github.com/MuhammadTahaNaveed/age/pull/80.patch" | git am -3 --ignore-whitespace
+          curl -L "https://github.com/MuhammadTahaNaveed/age/pull/80.patch" | git apply -v
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: apply-pr-PG11     #this will contain the head branch name + PG11 + some keyword to indicate that this branch is created by github bot
+          branch: apply-pr-master     #this will contain the head branch name + PG11 + some keyword to indicate that this branch is created by github bot
 
       #    "patch_url": "https://github.com/MuhammadTahaNaveed/age/pull/79.patch",
 # # Download a patch and apply it.
