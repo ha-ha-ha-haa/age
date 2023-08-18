@@ -37,8 +37,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
           COMMITS_INFO=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}/commits")
-          echo "::set-output name=pr_info::$PR_INFO"
-          echo "::set-output name=commits_info::$COMMITS_INFO"
+          echo "PR_INFO=$PR_INFO" >> $GITHUB_ENV
+          echo "COMMITS_INFO=$COMMITS_INFO" >> $GITHUB_ENV
 
       - name: Display Pull Request and Commits Info
         run: |
