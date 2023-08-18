@@ -39,22 +39,20 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: patch_url
-      - name: read patch url 
-        run: |
-          value=`cat patch_url.txt`
-          echo $value
 
-      # - uses: actions/checkout@v3
-      #   with:
-      #     ref: PG15
-      # - name: Reset promotion branch
-      #   run: |
-      #     git fetch origin auto-sync-pr
-      #     git reset --hard origin/auto-sync-pr
-      # - name: Create Pull Request
-      #   uses: peter-evans/create-pull-request@v5
-      #   with:
-      #     branch: apply-pr
+      - uses: actions/checkout@v3
+        with:
+          ref: PG11
+      - name: Create commit using patch for PG11 branch
+        run: |
+          patch_url=`cat patch_url.txt`
+          curl -L patch_url | git apply -v
+          git add .
+          git commit -m 'Applied PR [This will be original commit message.]'
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: apply-pr-PG11     #this will contain the head branch name + PG11 + some keyword to indicate that this branch is created by github bot
 
       #    "patch_url": "https://github.com/MuhammadTahaNaveed/age/pull/79.patch",
 # # Download a patch and apply it.
