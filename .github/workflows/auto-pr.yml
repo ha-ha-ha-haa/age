@@ -39,6 +39,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: patch_url
+      - name: Read patch url and set as environment variable
+        run: |
+          patch_url=$(cat patch_url.txt)
+          echo "PATCH_URL=$patch_url" >> $GITHUB_ENV
 
       - uses: actions/checkout@v3
         with:
@@ -46,7 +50,7 @@ jobs:
       - name: Create commit using patch for PG11 branch
         run: |
           patch_url=`cat patch_url.txt`
-          curl -L patch_url | git apply -v
+          curl -L $PATCH_URL | git apply -v
           git add .
           git commit -m 'Applied PR [This will be original commit message.]'
       - name: Create Pull Request
