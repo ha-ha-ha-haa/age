@@ -14,8 +14,7 @@ jobs:
         if: |                                                   # check the keyword and authors(TODO: use actor id for author verification)
           contains('["/sync"]', github.event.comment.body) &&
           contains('["MuhammadTahaNaveed"]', github.actor)
-        run: |
-          echo "Author and keyword verified.... Triggering event"
+        run: echo "Author and keyword verified.... Triggering event"
         
       - name: Exit the job if keyword and author unverified
         if: ${{ steps.trigger.conclusion == 'skipped' }}
@@ -32,7 +31,7 @@ jobs:
       #     name: patch_url
       - name: Read patch url and set as environment variable
         env:
-          PATCH_URL: ${{ github }}
+          PATCH_URL: ${{ toJson(github) }}
         run: |
           echo "$PATCH_URL"
 
