@@ -50,8 +50,8 @@ jobs:
       - name: Create commit using patch for PG11 branch
         run: |
           curl -L $PATCH_URL | git apply -v
-          git add .
-          git commit -m 'Applied PR [This will be original commit message.]'
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
@@ -62,3 +62,6 @@ jobs:
 # curl $URL | git apply -v --index
 # # Commit patch and add a log message.
 # git commit -m "Applied $URL."
+
+          # git add .
+          # git commit -m 'Applied PR [This will be original commit message.]'
